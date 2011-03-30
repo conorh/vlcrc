@@ -1,0 +1,19 @@
+name: vlcrc
+nice name: 'VLC-RC'
+
+summary: 'a ruby wrapper to the VLC TCP interface'
+description: "Allows control of a VLC instance through a ruby object. Uses VLC's built-in TCP interface to send commands and recieve information."
+
+author: Carl Suster
+email: carl.suster@gmail.com
+homepage: 'http://github.com/carl-suster/vlcrc'
+
+features:
+  Playlist management: false
+  "Main commands (play/pause/stop/etc.)": true
+  "Status information (position/filename/length/playing?/etc.)": true
+  Allows multiple instances of VLC to be controlled: true
+  Allows launching and termination of a VLC instance: true
+  
+acknowledgements:
+- 'https://videolan.org/VLC'

@@ -1,0 +1,14 @@
+= {{nice name}}: {{summary}}
+{{description}}
+
+{{features}}
+
+== Requires
+The following components are required to use {{nice name}}
+
+{{dependencies}}
+
+== Acknowledgement
+The following sources were used as references 
+
+{{acknowledgements}}

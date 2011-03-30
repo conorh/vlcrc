@@ -1,0 +1,20 @@
+= VLC-RC: a ruby wrapper to the VLC TCP interface
+Allows control of a VLC instance through a ruby object. Uses VLC's built-in TCP interface to send commands and recieve information.
+
+* Main commands (play/pause/stop/etc.)
+* Status information (position/filename/length/playing?/etc.)
+* Allows multiple instances of VLC to be controlled
+* Allows launching and termination of a VLC instance
+* Playlist management [planned]
+
+== Requires
+The following components are required to use VLC-RC
+
+* ruby (>= 1.9.2)
+* rubygems (>= 1.3.6)
+* rspec (>= 2.5.0, development)
+
+== Acknowledgement
+The following sources were used as references 
+
+* https://videolan.org/VLC
