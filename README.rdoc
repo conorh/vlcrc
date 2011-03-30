@@ -17,4 +17,4 @@ The following components are required to use VLC-RC
 == Acknowledgement
 The following sources were used as references 
 
-* https://videolan.org/VLC
+* https://videolan.org/vlc

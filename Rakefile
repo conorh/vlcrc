@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
-#require 'rspec/core/rake_task'
+require 'rspec/core/rake_task'
 require 'rake/rdoctask'
 require 'lib/vlcrc'
 require 'yaml'
@@ -12,10 +12,10 @@ def with_gemspec
   yield gemspec
 end
 
-#desc "Run specs"
-#RSpec::Core::RakeTask.new do |t|
-#  t.pattern = "./spec/**/*_spec.rb"
-#end
+desc "Run specs"
+RSpec::Core::RakeTask.new do |t|
+  t.pattern = "./spec/**/*_spec.rb"
+end
 
 desc "Validate the gemspec"
 task :gemspec do
