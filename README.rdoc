@@ -7,8 +7,49 @@ Allows control of a VLC instance through a ruby object. Uses VLC's built-in TCP 
 * Allows launching and termination of a VLC instance
 * Playlist management [planned]
 
+== Usage
+VLC-RC is a library for controlling VLC since a CLI would be redundant given that it uses VLC's built-in TCP interface anyway. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
+
+  require 'vlcrc'
+  
+  # Create a new VLC object, which attempts to connect
+  vlc = VLCRC::VLC.new localhost, 1234
+  
+  # Launch an instance of VLC bound to the above socket
+  vlc.launch
+  
+  # Connect to it (have to wait for it to launch though)
+  until vlc.connected?
+    sleep 0.1
+    vlc.connect
+  end
+
+VLC can be configured to run with the RC interface open by default on a certain socket so that you can connect to instances of VLC that are already open. Note that different instances need to run on different sockets. Now that it's up and running,
+
+  # Start playing a file
+  vlc.media = "/path/to/a/video.avi"
+  
+  # Seek to the middle of the file
+  middle = ( vlc.length / 2 ).round
+  vlc.position = middle
+  
+  # Add a bunch of files and move around
+  vlc.playlist = [
+    "/path/to/first/file.avi",
+    "/path/to/another/one.mkv",
+    "/path/to/something/else.mp4"
+  ]
+  vlc.skip
+  vlc.media   #=> "/path/to/another/one.mkv"
+  
+  # Stop the file
+  vlc.playing = false
+  
+  # Close VLC
+  vlc.exit
+
 == Requires
-The following components are required to use VLC-RC
+VLC-RC needs all this stuff
 
 * ruby (>= 1.9.2)
 * rubygems (>= 1.3.6)
@@ -16,6 +57,29 @@ The following components are required to use VLC-RC
 * rspec (>= 2.5.0, development)
 
 == Acknowledgement
-The following sources were used as references 
+Thanks to these sources, used as references during development
 
 * https://videolan.org/vlc
+
+== License
+
+Copyright (c) 2011 Carl Suster
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+

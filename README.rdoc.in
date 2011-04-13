@@ -3,12 +3,57 @@
 
 {{features}}
 
+== Usage
+{{nice name}} is a library for controlling VLC since a CLI would be redundant given that it uses VLC's built-in TCP interface anyway. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
+
+  require 'vlcrc'
+  
+  # Create a new VLC object, which attempts to connect
+  vlc = VLCRC::VLC.new localhost, 1234
+  
+  # Launch an instance of VLC bound to the above socket
+  vlc.launch
+  
+  # Connect to it (have to wait for it to launch though)
+  until vlc.connected?
+    sleep 0.1
+    vlc.connect
+  end
+
+VLC can be configured to run with the RC interface open by default on a certain socket so that you can connect to instances of VLC that are already open. Note that different instances need to run on different sockets. Now that it's up and running,
+
+  # Start playing a file
+  vlc.media = "/path/to/a/video.avi"
+  
+  # Seek to the middle of the file
+  middle = ( vlc.length / 2 ).round
+  vlc.position = middle
+  
+  # Add a bunch of files and move around
+  vlc.playlist = [
+    "/path/to/first/file.avi",
+    "/path/to/another/one.mkv",
+    "/path/to/something/else.mp4"
+  ]
+  vlc.skip
+  vlc.media   #=> "/path/to/another/one.mkv"
+  
+  # Stop the file
+  vlc.playing = false
+  
+  # Close VLC
+  vlc.exit
+
 == Requires
-The following components are required to use {{nice name}}
+{{nice name}} needs all this stuff
 
 {{dependencies}}
 
 == Acknowledgement
-The following sources were used as references 
+Thanks to these sources, used as references during development
 
 {{acknowledgements}}
+
+== License
+
+{{license}}

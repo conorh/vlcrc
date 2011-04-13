@@ -133,6 +133,8 @@ task :readme do
     gemspec.requirements
   end
 
+  data['license'] = File.read 'LICENSE'
+
   tags.each do |tag|
     insert = ""
     c = data[tag].class
