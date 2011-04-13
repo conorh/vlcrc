@@ -12,6 +12,7 @@ The following components are required to use VLC-RC
 
 * ruby (>= 1.9.2)
 * rubygems (>= 1.3.6)
+* vlc (>= 1.1.0)
 * rspec (>= 2.5.0, development)
 
 == Acknowledgement

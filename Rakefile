@@ -7,6 +7,8 @@ require 'lib/vlcrc'
 require 'yaml'
 require 'fileutils'
 
+VLC_VERSION = ">= 1.1.0"
+
 def with_gemspec
   gemspec = eval(File.read(Dir["*.gemspec"].first))
   yield gemspec
@@ -39,6 +41,9 @@ module VLCRC
   # name of the nearest tag, and the third bit is the number of commits
   # since the tag
   VERSION = "#{version}"
+
+  # The version of VLC required for this gem to function properly
+  FOR_VLC = "#{VLC_VERSION}"
 end
 eof
   unless version == VLCRC::VERSION
@@ -123,6 +128,7 @@ task :readme do
   with_gemspec do |gemspec|
   data['dependencies'] = ["ruby (#{gemspec.required_ruby_version})"] +
     ["rubygems (#{gemspec.required_rubygems_version})"] +
+    ["vlc (#{VLC_VERSION})"] +
     gemspec.dependencies +
     gemspec.requirements
   end
