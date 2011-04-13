@@ -1,4 +1,4 @@
-require File.join( File.dirname(__FILE__), 'spec_helper' )
+require 'spec_helper'
 
 describe VLCRC::VLC do
   subject do
@@ -33,5 +33,23 @@ describe VLCRC::VLC do
     subject.connected?.should be_false
     subject.connect
     subject.connected?.should be_true
+  end
+
+  it "adds items to the playlist" do
+    @vid = File.expand_path @video_samples.keys[0]
+    input = [@vid, @vid]
+    subject.playlist = input
+    subject.playlist.map{ |i| i[1] }.each{ |path| path.should == @vid }
+    subject.playing = true
+    subject.media.should == @vid
+  end
+
+  it "can skip to the next item and back" do
+    now_playing = subject.media
+    subject.next
+    subject.position.should be < 10
+    subject.prev
+    subject.position.should be < 10
+    subject.media.should == now_playing
   end
 end
