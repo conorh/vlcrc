@@ -43,7 +43,6 @@ module VLCRC
     # Did the socket connect to something?
     def connected?
       if @socket.nil?
-        puts "W: No connected VLC instance" #NOTE debug only
         return false
       end
       begin
@@ -95,16 +94,16 @@ module VLCRC
       if playing
         status = long_ask "status"
         return false unless status
-        status.scan( /file:\/\/(.*) \)/ )[0][0]
+        path = status.scan( /file:\/\/(.*) \)/ )
+        path = status.scan( /input: (.*) \)/ ) if path.empty?
+        path [0][0]
       else
         false
       end
     end
 
     # Open a given file in the current media player instance
-    def media=( file )
-      #TODO open a specified media file
-    end
+    def media=( file ) ask "add file://#{file}", false end
 
     # Get the currently selected subtitle track
     def subtitle() ask( "strack" ).to_i end
@@ -119,15 +118,31 @@ module VLCRC
       info.scan( /Frame rate: (\d*)/ )[0][0].to_i
     end
 
+    # Skip to the next item in the playlist
+    def next() ask "next", false end
+
+    # Go back to previous item in the playlist
+    def prev() ask "prev", false end
+
     # Look at the contents of the playlist
     def playlist
-      long_ask "playlist"
-      #TODO process and return as an array
+      raw = long_ask "playlist"
+      playlist_id = raw.scan( /\| (\d*) - Playlist/ )[0][0]
+      queue = long_ask "playlist #{playlist_id}"
+      queue = queue.split( "|" ).map do |item|
+        item.scan /(\d*) - (file:\/\/)?(.*) \((.*)\)( \[played (\d*))?/
+      end
+      queue.reject{ |i| i.empty? }.map{ |i| i[0] }.map do |i|
+        [i[0], i[2], i[3], i[5]]
+      end
     end
 
     # Set the contents of the playlist
     def playlist=( queue )
-      #TODO append/replace playlist with an array of paths to media files
+      ask "clear", false
+      queue.each do |file|
+        ask "enqueue file://#{file}", false
+      end
     end
 
     private
@@ -155,7 +170,6 @@ module VLCRC
           return @socket.gets.chomp
         end
       rescue Timeout::Error
-        puts "I: #{@socket} timed out" #NOTE debug only
         return nil
       end
     end
