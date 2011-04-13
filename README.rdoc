@@ -48,6 +48,8 @@ VLC can be configured to run with the RC interface open by default on a certain 
   # Close VLC
   vlc.exit
 
+To run the specs, you'll need to add at least one video file to spec/data (anything that VLC can open will do). Just pop the file(s) in, and then the specs should run without issue.
+
 == Requires
 VLC-RC needs all this stuff
 

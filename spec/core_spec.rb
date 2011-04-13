@@ -17,7 +17,7 @@ describe VLCRC::VLC do
   end
 
   it "opens a media file and detects status properties" do
-    @vid = @video_samples.keys[0]
+    @vid = @video_samples[0]
     subject.playing.should be_false
     subject.media = @vid
     subject.playing.should be_true
@@ -36,12 +36,10 @@ describe VLCRC::VLC do
   end
 
   it "adds items to the playlist" do
-    @vid = File.expand_path @video_samples.keys[0]
-    input = [@vid, @vid]
-    subject.playlist = input
-    subject.playlist.map{ |i| i[1] }.each{ |path| path.should == @vid }
+    subject.playlist = @video_samples
+    subject.playlist.map{ |i| i[1] }.each_with_index{ |path,i| path.should == @video_samples[i] }
     subject.playing = true
-    subject.media.should == @vid
+    subject.media.should == @video_samples[0]
   end
 
   it "can skip to the next item and back" do

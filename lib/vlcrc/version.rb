@@ -3,7 +3,7 @@ module VLCRC
   # about the git repository. The Major and Minor bits are from the
   # name of the nearest tag, and the third bit is the number of commits
   # since the tag
-  VERSION = "0.1.7"
+  VERSION = "0.1.8"
 
   # The version of VLC required for this gem to function properly
   FOR_VLC = ">= 1.1.0"
