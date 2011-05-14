@@ -6,4 +6,4 @@ pkg
 .bundle
 doc
 spec/*.log
-spec/data/*
+.yardoc
