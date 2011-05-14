@@ -1,6 +1,6 @@
 $:.push File.expand_path("../lib", __FILE__)
 
-require 'vlcrc'
+require 'vlcrc/version'
 require 'yaml'
 require 'fileutils'
 
