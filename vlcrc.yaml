@@ -14,6 +14,7 @@ features:
   "Status information (position/filename/length/playing?/etc.)": true
   Allows multiple instances of VLC to be controlled: true
   Allows launching and termination of a VLC instance: true
+  Command line control (simpler than VLC's Telnet interface): false
   
 acknowledgements:
 - 'https://videolan.org/vlc'

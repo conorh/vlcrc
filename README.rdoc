@@ -6,6 +6,7 @@ Allows control of a VLC instance through a ruby object. Uses VLC's built-in TCP 
 * Allows multiple instances of VLC to be controlled
 * Allows launching and termination of a VLC instance
 * Playlist management [planned]
+* Command line control (simpler than VLC's Telnet interface) [planned]
 
 == Usage
 VLC-RC is a library for controlling VLC since a CLI would be redundant given that it uses VLC's built-in TCP interface anyway. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
@@ -55,8 +56,10 @@ VLC-RC needs all this stuff
 
 * ruby (>= 1.9.2)
 * rubygems (>= 1.3.6)
+* rspec (~> 2.5.0, development)
+* bundler (~> 1.0.0, development)
+* rake (>= 0, development)
 * vlc (>= 1.1.0)
-* rspec (>= 2.5.0, development)
 
 == Acknowledgement
 Thanks to these sources, used as references during development

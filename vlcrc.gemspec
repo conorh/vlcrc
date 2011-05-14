@@ -1,9 +1,7 @@
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
+$:.push File.expand_path("../lib", __FILE__)
 
-require 'lib/vlcrc/version'
+require 'vlcrc/version'
 require 'yaml'
-
 data = YAML.load_file 'vlcrc.yaml'
 
 Gem::Specification.new do |s|
@@ -17,16 +15,21 @@ Gem::Specification.new do |s|
   s.description       = data['description']
   s.rubyforge_project = s.name
 
-  s.has_rdoc          = true
   s.extra_rdoc_files  << "README.rdoc"
   s.rdoc_options   << '--title' << data['nice name'] <<
                         '--main' << 'README.rdoc'
 
-  s.add_development_dependency "rspec", ">= 2.5.0"
+  s.add_development_dependency "rspec", "~> 2.5.0"
+  s.add_development_dependency "bundler", "~> 1.0.0"
+  s.add_development_dependency "rake"
+
+  s.requirements << "vlc (#{VLCRC::FOR_VLC})"
 
   s.required_rubygems_version = ">= 1.3.6"
   s.required_ruby_version     = ">= 1.9.2"
 
   s.files         = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.rdoc)
-  s.test_files    = Dir.glob("spec/**/*")
+  s.test_files    = Dir.glob("spec/*_soec.rb") + %w[spec/spec_helper.rb]
+  s.executables   << "vlcrc"
+  s.require_paths << "lib"
 end
