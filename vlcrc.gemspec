@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec", "~> 2.5.0"
   s.add_development_dependency "bundler", "~> 1.0.0"
   s.add_development_dependency "rake"
+  s.add_dependency             "trollop", "~> 1.16.2"
 
   s.requirements << "vlc (#{VLCRC::FOR_VLC})"
 

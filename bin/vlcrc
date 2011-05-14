@@ -1,6 +1,162 @@
 #!/usr/bin/env ruby
 
-$:.push File.expand_path("../lib", __FILE__)
-
 require 'vlcrc'
-# FIXME
+require 'trollop'
+
+$name    = "vlcrc"
+$nname   = "VLC-RC"
+$summary = "{{description}}" # FIXME
+
+# All second-level commands for the CLI and a brief description for each.
+SUBCOMMANDS = {
+  "launch"  => "launch an instance of vlc on a specified TCP socket",
+  "quit"    => "close an instance of vlc",
+  "exit"    => "alias for quit",
+  "mediate" => "set up a new socket, listen for and relay commands", # TODO
+
+  # controling playback
+  "play"  => "start playback",
+  "pause" => "pause playback",
+  "stop"  => "stop playback",
+  "seek"  => "<i> jump to time i in the current media",
+
+  # media files
+  "subs" => "<i> choose a subtitle track",
+  "open" => "<file> add file to the playlist and play it",
+  "info" => "summary of what's going on in vlc now",
+  "list" => "show the playlist",
+  "jump" => "<i> play item with index i from the playlist",
+  "next" => "skip to next item in playlist",
+  "prev" => "go to previous item in playlist"
+}
+
+#------------------------------------------------------------usage---
+usage =
+%!#{$nname} - #{$summary}
+usage:  #{$name} global options
+   or:  #{$name} [global options] command [options]
+
+where [command] is one of:
+#{SUBCOMMANDS.map{|c| "%10s:   %s" % c}.join($/)}
+(get help for individual commands with #{$name} command --help)
+
+If host and port are not specified, an attempt will be made to find a running instance of VLC to connect to before falling back on the default values.
+
+[global options] are:!
+#------------------------------------------------------------usage---
+
+# Get the global options
+global = Trollop::Parser.new do
+  banner usage
+  version "#{$name} #{VLCRC::VERSION}"
+  stop_on SUBCOMMANDS.keys
+
+  opt :host,
+    "The hostname of the TCP socket to connect to",
+    :default => "localhost"
+  opt :port,
+    "The port of the TCP soccket to connect to",
+    :default => 1234
+end
+go = Trollop::with_standard_exception_handling global do
+  o = global.parse ARGV
+  raise Trollop::HelpNeeded if ARGV.empty?
+  o
+end
+
+# Helper methods
+def discover
+  ps = %x{ps -C vlc -o cmd}
+  instances = ps.scan( /host='([^']*)'/ ).flatten
+  instances.each {|i| $stderr.puts "D: Found VLC on #{i}" }
+  instances
+end
+def connect( host, port )
+  $vlc = VLCRC::VLC.new host, port
+  begin
+    timeout( 0.5 ) { $vlc.connect until $vlc.connected? }
+  rescue Timeout::Error
+    return false
+    $stderr.puts "D: No VLC instance found on #{host}:#{port}"
+  end
+  $stderr.puts "D: Connected to VLC on #{host}:#{port}"
+  true
+end
+def select( go )
+  d = discover
+  h,p = if ( go[:port_given] or
+             go[:host_given] or
+             d.empty? )
+          [go[:host],go[:port]]
+        elsif d.size > 1
+          puts "Found multiple instances of VLC. Choose one:"
+          puts "  -1   (default)"
+          d.each_with_index {|d,i| puts "   %d   %s" % [i,d] }
+          d.push( "#{go[:host]}:#{go[:port]}" )[gets.to_i].split ?:
+        else
+          d[0].split ?:
+        end
+  [h,p]
+end
+
+# Process the subcommand
+case ARGV.shift # alphabetised
+#-----------------------------------------------------------command---
+when "info"
+  exit 1 unless connect *select( go )
+  if $vlc.playing
+    puts "#{$vlc.position/1000}s into #{$vlc.media}"
+  else
+    puts "Not playing anything."
+  end
+when "jump"
+  exit 1 unless connect *select( go )
+  exit 2 unless ARGV[0]
+  $vlc.jump ARGV[0].to_i
+when "launch"
+  if connect go[:host], go[:port]
+    $stderr.puts "I: VLC already running on the specified socket"
+  else
+    $vlc.launch
+    $stderr.puts "I: Launched VLC instance"
+    connect go[:host], go[:port]
+  end
+when "next"
+  exit 1 unless connect *select( go )
+  $vlc.next
+when "list"
+  exit 1 unless connect *select( go )
+  $vlc.playlist.each do |item|
+    puts "%5d  %s (%s)" % item[0..2]
+  end
+when "open"
+  exit 1 unless connect *select( go )
+  exit 2 unless File.file? ARGV[0]
+  $vlc.media = ARGV[0]
+when "pause"
+  exit 1 unless connect *select( go )
+  $vlc.pause
+when "play"
+  exit 1 unless connect *select( go )
+  $vlc.playing = true
+when "prev"
+  exit 1 unless connect *select( go )
+  $vlc.prev
+when "quit", "exit"
+  exit 1 unless connect *select( go )
+  $vlc.exit
+when "seek"
+  exit 1 unless connect *select( go )
+  $vlc.position = ARGV[0].to_i
+when "stop"
+  exit 1 unless connect *select( go )
+  $vlc.playing = false
+when "stop"
+  exit 1 unless connect *select( go )
+  exit 2 unless ARGV[0]
+  $vlc.subtitle = ARGV[0].to_i
+#-----------------------------------------------------------command---
+else
+  Trollop::options {} # workaround since die must follow options
+  Trollop::die "unknown command #{cmd.inspect}"
+end

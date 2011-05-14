@@ -128,6 +128,9 @@ module VLCRC
     # Go back to previous item in the playlist.
     def prev() ask "prev", false end
 
+    # Go to the item in the playlist with the specified index.
+    def jump(i) ask "goto #{i}", false end
+
     # Look at the contents of the playlist.
     def playlist
       raw = long_ask "playlist"

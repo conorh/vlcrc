@@ -9,7 +9,7 @@ Allows control of a VLC instance through a ruby object. Uses VLC's built-in TCP 
 * Command line control (simpler than VLC's Telnet interface) [planned]
 
 == Usage
-VLC-RC is a library for controlling VLC since a CLI would be redundant given that it uses VLC's built-in TCP interface anyway. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
+VLC-RC is a library for controlling VLC and includes a CLI wrapper for VLC's built-in TCP interface since that can be a little confusing. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
 
   require 'vlcrc'
   
@@ -51,6 +51,11 @@ VLC can be configured to run with the RC interface open by default on a certain 
 
 To run the specs, you'll need to add at least one video file to spec/data (anything that VLC can open will do). Just pop the file(s) in, and then the specs should run without issue.
 
+== CLI
+This is pretty basic, there are a few main methods demonstrated below. If you want more control, then go for the full shebang: use VLC's Telnet interface.
+
+  vlcrc --help
+
 == Requires
 VLC-RC needs all this stuff
 
@@ -59,6 +64,7 @@ VLC-RC needs all this stuff
 * rspec (~> 2.5.0, development)
 * bundler (~> 1.0.0, development)
 * rake (>= 0, development)
+* trollop (~> 1.16.2)
 * vlc (>= 1.1.0)
 
 == Acknowledgement

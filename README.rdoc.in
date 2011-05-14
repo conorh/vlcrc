@@ -4,9 +4,9 @@
 {{features}}
 
 == Usage
-{{nice name}} is a library for controlling VLC since a CLI would be redundant given that it uses VLC's built-in TCP interface anyway. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
+{{nice name}} is a library for controlling VLC and includes a CLI wrapper for VLC's built-in TCP interface since that can be a little confusing. To use this Ruby binding for the TCP interface, look at this to initialise the connection.
 
-  require 'vlcrc'
+  require '{{name}}'
   
   # Create a new VLC object, which attempts to connect
   vlc = VLCRC::VLC.new localhost, 1234
@@ -45,6 +45,11 @@ VLC can be configured to run with the RC interface open by default on a certain 
   vlc.exit
 
 To run the specs, you'll need to add at least one video file to spec/data (anything that VLC can open will do). Just pop the file(s) in, and then the specs should run without issue.
+
+== CLI
+This is pretty basic, there are a few main methods demonstrated below. If you want more control, then go for the full shebang: use VLC's Telnet interface.
+
+  {{name}} --help
 
 == Requires
 {{nice name}} needs all this stuff
