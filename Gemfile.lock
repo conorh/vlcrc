@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vlcrc (0.1.12)
+    vlcrc (0.1.14)
       trollop (~> 1.16.2)
 
 GEM

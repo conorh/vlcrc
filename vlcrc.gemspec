@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.required_ruby_version     = ">= 1.9.2"
 
-  s.files         = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.rdoc)
+  s.files         = Dir.glob("{bin,lib}/**/*") + %w(.yardopts LICENSE README.rdoc)
   s.test_files    = Dir.glob("spec/*_soec.rb") + %w[spec/spec_helper.rb]
   s.executables   << "vlcrc"
   s.require_paths << "lib"
