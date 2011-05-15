@@ -57,18 +57,26 @@ global = Trollop::Parser.new do
   opt :port,
     "The port of the TCP soccket to connect to",
     :default => 1234
+  opt :verbose,
+    "Show information",
+    :default => false
+  opt :debug,
+    "Show debug information (implies -v)",
+    :default => false
 end
 go = Trollop::with_standard_exception_handling global do
   o = global.parse ARGV
   raise Trollop::HelpNeeded if ARGV.empty?
   o
 end
+$vd = go[:debug]
+$vi = go[:verbose] || go[:debug]
 
 # Helper methods
 def discover
   ps = %x{ps -C vlc -o cmd}
   instances = ps.scan( /host='([^']*)'/ ).flatten
-  instances.each {|i| $stderr.puts "D: Found VLC on #{i}" }
+  instances.each {|i| $stderr.puts "D: Found VLC on #{i}" } if $vd
   instances
 end
 def connect( host, port )
@@ -77,9 +85,9 @@ def connect( host, port )
     timeout( 0.5 ) { $vlc.connect until $vlc.connected? }
   rescue Timeout::Error
     return false
-    $stderr.puts "D: No VLC instance found on #{host}:#{port}"
+    $stderr.puts "D: No VLC instance found on #{host}:#{port}" if $vd
   end
-  $stderr.puts "D: Connected to VLC on #{host}:#{port}"
+  $stderr.puts "D: Connected to VLC on #{host}:#{port}" if $vd
   true
 end
 def select( go )
@@ -115,10 +123,10 @@ when "jump"
   $vlc.jump ARGV[0].to_i
 when "launch"
   if connect go[:host], go[:port]
-    $stderr.puts "I: VLC already running on the specified socket"
+    $stderr.puts "I: VLC already running on the specified socket" if $vi
   else
     $vlc.launch
-    $stderr.puts "I: Launched VLC instance"
+    $stderr.puts "I: Launched VLC instance" if $vi
     connect go[:host], go[:port]
   end
 when "next"
@@ -131,8 +139,9 @@ when "list"
   end
 when "open"
   exit 1 unless connect *select( go )
-  exit 2 unless File.file? ARGV[0]
-  $vlc.media = ARGV[0]
+  file = File.expand_path ARGV[0]
+  exit 2 unless File.file? file
+  $vlc.media = file
 when "pause"
   exit 1 unless connect *select( go )
   $vlc.pause
