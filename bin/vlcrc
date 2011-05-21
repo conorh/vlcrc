@@ -108,18 +108,18 @@ def select( go )
           when /\w*:\d*/ then choice.split ?:
           when /\d*/ then d[choice.to_i].split ?:
           else [go[:host], go[:port]]
-          end
+          end.tap {|h,p| puts "Using #{h}:#{p}\n\n" }
         else
           d[0].split ?:
         end
-  puts "Using #{h}:#{p}\n"
   [h,p]
 end
 
+cmd  = ARGV.shift
 args = ARGV.dup
 ARGV.delete_if { true } # empty out `ARGV` so that `gets` works
 # Process the subcommand
-case args.shift # alphabetised
+case cmd # alphabetised
 #-----------------------------------------------------------command---
 when "info"
   exit 1 unless connect *select( go )
