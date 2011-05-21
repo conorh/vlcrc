@@ -7,6 +7,11 @@ $name    = "vlcrc"
 $nname   = "VLC-RC"
 $summary = "{{description}}" # FIXME
 
+# TODO move discovery logic to core.rb
+# TODO make launch open a new instance (increment port number by 1)
+#      if there is a running instance found
+# TODO connect to each instance and extract playing file
+
 # All second-level commands for the CLI and a brief description for each.
 SUBCOMMANDS = {
   "launch"  => "launch an instance of vlc on a specified TCP socket",
@@ -75,17 +80,16 @@ $vi = go[:verbose] || go[:debug]
 # Helper methods
 def discover
   ps = %x{ps -C vlc -o cmd}
-  instances = ps.scan( /host='([^']*)'/ ).flatten
-  instances.each {|i| $stderr.puts "D: Found VLC on #{i}" } if $vd
-  instances
+  ps.scan( /host='([^']*)'/ ).flatten
+    .tap {|i| $stderr.puts "D: Found VLC on #{i}" if $vd }
 end
 def connect( host, port )
   $vlc = VLCRC::VLC.new host, port
   begin
     timeout( 0.5 ) { $vlc.connect until $vlc.connected? }
   rescue Timeout::Error
-    return false
     $stderr.puts "D: No VLC instance found on #{host}:#{port}" if $vd
+    return false
   end
   $stderr.puts "D: Connected to VLC on #{host}:#{port}" if $vd
   true
@@ -97,18 +101,25 @@ def select( go )
              d.empty? )
           [go[:host],go[:port]]
         elsif d.size > 1
-          puts "Found multiple instances of VLC. Choose one:"
-          puts "  -1   (default)"
-          d.each_with_index {|d,i| puts "   %d   %s" % [i,d] }
-          d.push( "#{go[:host]}:#{go[:port]}" )[gets.to_i].split ?:
+          puts "Found multiple instances of VLC. Choose one [or host:port]:"
+          d.each_with_index {|f,i| puts "   %d   %s" % [i,f] }
+          choice = gets.chomp
+          case choice
+          when /\w*:\d*/ then choice.split ?:
+          when /\d*/ then d[choice.to_i].split ?:
+          else [go[:host], go[:port]]
+          end
         else
           d[0].split ?:
         end
+  puts "Using #{h}:#{p}\n"
   [h,p]
 end
 
+args = ARGV.dup
+ARGV.delete_if { true } # empty out `ARGV` so that `gets` works
 # Process the subcommand
-case ARGV.shift # alphabetised
+case args.shift # alphabetised
 #-----------------------------------------------------------command---
 when "info"
   exit 1 unless connect *select( go )
@@ -119,14 +130,14 @@ when "info"
   end
 when "jump"
   exit 1 unless connect *select( go )
-  exit 2 unless ARGV[0]
-  $vlc.jump ARGV[0].to_i
+  exit 2 unless args[0]
+  $vlc.jump args[0].to_i
 when "launch"
   if connect go[:host], go[:port]
     $stderr.puts "I: VLC already running on the specified socket" if $vi
   else
     $vlc.launch
-    $stderr.puts "I: Launched VLC instance" if $vi
+    $stderr.puts "I: Launched VLC instance"  if $vi
     connect go[:host], go[:port]
   end
 when "next"
@@ -138,8 +149,8 @@ when "list"
     puts "%5d  %s (%s)" % item[0..2]
   end
 when "open"
+  file = File.expand_path args[0]
   exit 1 unless connect *select( go )
-  file = File.expand_path ARGV[0]
   exit 2 unless File.file? file
   $vlc.media = file
 when "pause"
@@ -156,14 +167,14 @@ when "quit", "exit"
   $vlc.exit
 when "seek"
   exit 1 unless connect *select( go )
-  $vlc.position = ARGV[0].to_i
+  $vlc.position = args[0].to_i
 when "stop"
   exit 1 unless connect *select( go )
   $vlc.playing = false
 when "stop"
   exit 1 unless connect *select( go )
-  exit 2 unless ARGV[0]
-  $vlc.subtitle = ARGV[0].to_i
+  exit 2 unless args[0]
+  $vlc.subtitle = args[0].to_i
 #-----------------------------------------------------------command---
 else
   Trollop::options {} # workaround since die must follow options
