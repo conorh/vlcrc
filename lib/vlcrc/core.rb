@@ -137,7 +137,7 @@ module VLCRC
       playlist_id = raw.scan( /\| (\d*) - Playlist/ )[0][0]
       queue = long_ask "playlist #{playlist_id}"
       queue = queue.split( "|" ).map do |item|
-        item.scan /(\d*) - (file:\/\/)?(.*) \((.*)\)( \[played (\d*))?/
+        item.scan %r{(\d*) - (file:\/\/)?(.*) \((.*)\)( \[played (\d*))?}
       end
       queue.reject{ |i| i.empty? }.map{ |i| i[0] }.map do |i|
         [i[0], i[2], i[3], i[5]]

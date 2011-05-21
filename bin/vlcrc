@@ -7,10 +7,11 @@ $name    = "vlcrc"
 $nname   = "VLC-RC"
 $summary = "{{description}}" # FIXME
 
-# TODO move discovery logic to core.rb
-# TODO make launch open a new instance (increment port number by 1)
-#      if there is a running instance found
-# TODO connect to each instance and extract playing file
+# TODO  move discovery logic to core.rb
+# TODO  make launch open a new instance (increment port number by 1)
+#       if there is a running instance found
+# TODO  connect to each instance and extract playing file
+# FIXME seek only ever seeks to start of the file (core.rb problem?)
 
 # All second-level commands for the CLI and a brief description for each.
 SUBCOMMANDS = {
@@ -108,7 +109,7 @@ def select( go )
           when /\w*:\d*/ then choice.split ?:
           when /\d*/ then d[choice.to_i].split ?:
           else [go[:host], go[:port]]
-          end.tap {|h,p| puts "Using #{h}:#{p}\n\n" }
+          end.tap {|host,port| puts "Using #{host}:#{port}\n\n" }
         else
           d[0].split ?:
         end
@@ -167,7 +168,7 @@ when "quit", "exit"
   $vlc.exit
 when "seek"
   exit 1 unless connect *select( go )
-  $vlc.position = args[0].to_i
+  $vlc.position = args[0].to_i.tap{|a|p a}
 when "stop"
   exit 1 unless connect *select( go )
   $vlc.playing = false
