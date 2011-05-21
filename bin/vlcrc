@@ -11,7 +11,9 @@ $summary = "{{description}}" # FIXME
 # TODO  make launch open a new instance (increment port number by 1)
 #       if there is a running instance found
 # TODO  connect to each instance and extract playing file
-# FIXME seek only ever seeks to start of the file (core.rb problem?)
+# TODO  with unknown command, if ARGV[0] is a file, assume `open`
+# TODO  convert seconds to hh:mm:ss in `info`
+# TODO  VLC can handle directories as well as files for an argument
 
 # All second-level commands for the CLI and a brief description for each.
 SUBCOMMANDS = {
@@ -24,7 +26,7 @@ SUBCOMMANDS = {
   "play"  => "start playback",
   "pause" => "pause playback",
   "stop"  => "stop playback",
-  "seek"  => "<i> jump to time i in the current media",
+  "seek"  => "[+-]<i> jump to time i ms in the current media",
 
   # media files
   "subs" => "<i> choose a subtitle track",
@@ -44,7 +46,6 @@ usage:  #{$name} global options
 
 where [command] is one of:
 #{SUBCOMMANDS.map{|c| "%10s:   %s" % c}.join($/)}
-(get help for individual commands with #{$name} command --help)
 
 If host and port are not specified, an attempt will be made to find a running instance of VLC to connect to before falling back on the default values.
 
@@ -61,7 +62,7 @@ global = Trollop::Parser.new do
     "The hostname of the TCP socket to connect to",
     :default => "localhost"
   opt :port,
-    "The port of the TCP soccket to connect to",
+    "The port of the TCP socket to connect to",
     :default => 1234
   opt :verbose,
     "Show information",
